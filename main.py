@@ -66,126 +66,382 @@ def dashboard():
 
     top_header()
 
+    # -----------------------------------------------------
+    # HERO SECTION
+    # -----------------------------------------------------
+
     with ui.column().classes(
-        'w-full max-w-6xl mx-auto p-8 gap-6'
+        'w-full items-center text-center p-10 gap-4'
+    ).style(
+        '''
+        background: linear-gradient(
+            135deg,
+            #4338ca 0%,
+            #7c3aed 48%,
+            #db2777 100%
+        );
+        color: white;
+        border-radius: 0 0 30px 30px;
+        box-shadow: 0 10px 30px rgba(79, 70, 229, 0.18);
+        '''
+    ):
+
+        ui.icon(
+            'auto_awesome',
+            size='58px'
+        )
+
+        ui.label(
+            'OBE Lesson Planning Assistant'
+        ).classes(
+            'text-4xl font-bold'
+        )
+
+        ui.label(
+            'From Outcomes to Impact'
+        ).classes(
+            'text-2xl font-semibold'
+        )
+
+        ui.label(
+            'Transform PLOs and CLOs into meaningful, aligned and '
+            'measurable classroom experiences.'
+        ).classes(
+            'text-lg max-w-3xl'
+        )
+
+        ui.button(
+            'Start Lesson Planning',
+            icon='rocket_launch',
+            on_click=lambda: ui.navigate.to('/lesson-planner')
+        ).props(
+            'unelevated rounded'
+        ).classes(
+            'q-mt-md text-lg'
+        ).style(
+            '''
+            background-color: white;
+            color: #5b21b6;
+            font-weight: 700;
+            padding: 8px 20px;
+            '''
+        )
+
+    # -----------------------------------------------------
+    # MAIN DASHBOARD CONTENT
+    # -----------------------------------------------------
+
+    with ui.column().classes(
+        'w-full max-w-6xl mx-auto p-8 gap-8'
     ):
 
         ui.label(
-            'Dashboard'
+            'Build Your OBE Lesson'
         ).classes(
-            'text-3xl font-bold'
+            'text-3xl font-bold text-center'
         )
 
         ui.label(
-            'Welcome to the OBE Lesson Planning Assistant.'
+            'Follow the OBE journey from programme outcomes '
+            'to classroom assessment, evaluation and improvement.'
         ).classes(
-            'text-lg'
+            'text-center text-gray-600 text-lg'
         )
 
-        ui.label(
-            'Design constructively aligned lessons by connecting '
-            'PLOs, CLOs, Bloom’s Taxonomy, teaching activities, '
-            'assessment and evaluation.'
-        )
+        # -------------------------------------------------
+        # OBE ALIGNMENT FLOW
+        # -------------------------------------------------
 
-        ui.separator()
+        with ui.card().classes(
+            'w-full p-6'
+        ).style(
+            '''
+            border-radius: 20px;
+            background: linear-gradient(
+                90deg,
+                #f8fafc,
+                #f5f3ff
+            );
+            '''
+        ):
+
+            ui.label(
+                'The OBE Alignment Journey'
+            ).classes(
+                'text-xl font-bold text-center'
+            )
+
+            with ui.row().classes(
+                'w-full justify-center items-center '
+                'gap-3 flex-wrap q-mt-md'
+            ):
+
+                ui.badge(
+                    'PLO',
+                    color='indigo'
+                ).classes(
+                    'text-base p-3'
+                )
+
+                ui.icon(
+                    'arrow_forward',
+                    color='grey'
+                )
+
+                ui.badge(
+                    'CLO',
+                    color='purple'
+                ).classes(
+                    'text-base p-3'
+                )
+
+                ui.icon(
+                    'arrow_forward',
+                    color='grey'
+                )
+
+                ui.badge(
+                    'Learning Activity',
+                    color='pink'
+                ).classes(
+                    'text-base p-3'
+                )
+
+                ui.icon(
+                    'arrow_forward',
+                    color='grey'
+                )
+
+                ui.badge(
+                    'Assessment',
+                    color='orange'
+                ).classes(
+                    'text-base p-3'
+                )
+
+                ui.icon(
+                    'arrow_forward',
+                    color='grey'
+                )
+
+                ui.badge(
+                    'Evaluation',
+                    color='teal'
+                ).classes(
+                    'text-base p-3'
+                )
+
+        # -------------------------------------------------
+        # DASHBOARD CARDS
+        # -------------------------------------------------
 
         with ui.row().classes(
-            'w-full gap-6 flex-wrap'
+            'w-full justify-center gap-6 flex-wrap'
         ):
 
             # COURSE SETUP
-            with ui.card().classes('w-64 p-5'):
+
+            with ui.card().classes(
+                'w-64 p-6 hover:shadow-xl'
+            ).style(
+                '''
+                border-top: 6px solid #2563eb;
+                border-radius: 18px;
+                min-height: 275px;
+                '''
+            ):
 
                 ui.icon(
                     'school',
-                    size='40px'
+                    size='48px',
+                    color='blue'
                 )
 
                 ui.label(
                     'Course Setup'
                 ).classes(
-                    'text-xl font-semibold'
+                    'text-xl font-bold'
                 )
 
                 ui.label(
-                    'Add programmes and courses.'
+                    'Create programmes, courses and academic information.'
+                ).classes(
+                    'text-gray-600'
                 )
+
+                ui.space()
 
                 ui.button(
-                    'Open',
+                    'Open Course Setup',
+                    icon='arrow_forward',
                     on_click=lambda: ui.navigate.to('/course-setup')
+                ).props(
+                    'outline'
                 )
 
-            # PLO CLO
-            with ui.card().classes('w-64 p-5'):
+            # PLO / CLO
+
+            with ui.card().classes(
+                'w-64 p-6 hover:shadow-xl'
+            ).style(
+                '''
+                border-top: 6px solid #7c3aed;
+                border-radius: 18px;
+                min-height: 275px;
+                '''
+            ):
 
                 ui.icon(
                     'account_tree',
-                    size='40px'
+                    size='48px',
+                    color='purple'
                 )
 
                 ui.label(
                     'PLOs & CLOs'
                 ).classes(
-                    'text-xl font-semibold'
+                    'text-xl font-bold'
                 )
 
                 ui.label(
-                    'Define and map learning outcomes.'
+                    'Define outcomes and create meaningful PLO-CLO alignment.'
+                ).classes(
+                    'text-gray-600'
                 )
 
+                ui.space()
+
                 ui.button(
-                    'Open',
+                    'Manage Outcomes',
+                    icon='arrow_forward',
                     on_click=lambda: ui.navigate.to('/outcomes')
+                ).props(
+                    'outline'
                 )
 
             # LESSON PLANNER
-            with ui.card().classes('w-64 p-5'):
+
+            with ui.card().classes(
+                'w-64 p-6 hover:shadow-xl'
+            ).style(
+                '''
+                border-top: 6px solid #ec4899;
+                border-radius: 18px;
+                min-height: 275px;
+                '''
+            ):
 
                 ui.icon(
                     'edit_note',
-                    size='40px'
+                    size='48px',
+                    color='pink'
                 )
 
                 ui.label(
-                    'Create OBE Lesson Plan'
+                    'Lesson Planner'
                 ).classes(
-                    'text-xl font-semibold'
+                    'text-xl font-bold'
                 )
 
                 ui.label(
-                    'Design an aligned lesson plan.'
+                    'Design constructively aligned teaching, '
+                    'learning and assessment.'
+                ).classes(
+                    'text-gray-600'
                 )
+
+                ui.space()
 
                 ui.button(
-                    'Start Lesson Planning',
-                    icon='arrow_forward',
+                    'Create Lesson Plan',
+                    icon='auto_awesome',
                     on_click=lambda: ui.navigate.to('/lesson-planner')
+                ).props(
+                    'unelevated'
+                ).style(
+                    '''
+                    background-color: #ec4899;
+                    color: white;
+                    '''
                 )
 
             # SAVED PLANS
-            with ui.card().classes('w-64 p-5'):
+
+            with ui.card().classes(
+                'w-64 p-6 hover:shadow-xl'
+            ).style(
+                '''
+                border-top: 6px solid #14b8a6;
+                border-radius: 18px;
+                min-height: 275px;
+                '''
+            ):
 
                 ui.icon(
-                    'folder',
-                    size='40px'
+                    'folder_open',
+                    size='48px',
+                    color='teal'
                 )
 
                 ui.label(
                     'Saved Plans'
                 ).classes(
-                    'text-xl font-semibold'
+                    'text-xl font-bold'
                 )
 
                 ui.label(
-                    'Review saved lesson plans.'
+                    'Access and review previously created lesson plans.'
+                ).classes(
+                    'text-gray-600'
                 )
 
+                ui.space()
+
                 ui.button(
-                    'Open',
+                    'View Plans',
+                    icon='arrow_forward',
                     on_click=lambda: ui.navigate.to('/saved-plans')
+                ).props(
+                    'outline'
                 )
+
+        # -------------------------------------------------
+        # BOTTOM MESSAGE
+        # -------------------------------------------------
+
+        with ui.card().classes(
+            'w-full p-7 text-center'
+        ).style(
+            '''
+            background: linear-gradient(
+                90deg,
+                #eef2ff,
+                #fdf2f8
+            );
+            border-radius: 20px;
+            border: 1px solid #ede9fe;
+            '''
+        ):
+
+            ui.icon(
+                'lightbulb',
+                size='40px',
+                color='amber'
+            )
+
+            ui.label(
+                'OBE is more than mapping outcomes.'
+            ).classes(
+                'text-2xl font-bold'
+            )
+
+            ui.label(
+                'Effective lesson planning connects what students should achieve, '
+                'what they do in class, how learning is assessed, and how teaching '
+                'is continuously improved.'
+            ).classes(
+                'text-lg text-gray-700 max-w-4xl mx-auto'
+            )
 
 
 # =========================================================
