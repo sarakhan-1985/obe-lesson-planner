@@ -1107,14 +1107,234 @@ def lesson_planner():
 
         with ui.row():
 
+                    # =====================================================
+        # OBE ALIGNMENT CHECK
+        # =====================================================
+
+        def check_alignment():
+
+            missing_fields = []
+
+            if not selected_course.value:
+                missing_fields.append('Course')
+
+            if not selected_clo.value:
+                missing_fields.append('CLO')
+
+            if not topic.value:
+                missing_fields.append('Lesson Topic')
+
+            if not lesson_outcome.value:
+                missing_fields.append('Lesson Learning Outcome')
+
+            if not teaching_method.value:
+                missing_fields.append('Teaching Method')
+
+            if not activity.value:
+                missing_fields.append('Teaching / Learning Activity')
+
+            if not assessment_method.value:
+                missing_fields.append('Assessment Method')
+
+            if not assessment_task.value:
+                missing_fields.append('Assessment Task')
+
+            if not success_criterion.value:
+                missing_fields.append('Success Criterion')
+
+            if not evaluation.value:
+                missing_fields.append('Evaluation / Improvement Plan')
+
+            if missing_fields:
+                ui.notify(
+                    'Please complete: ' + ', '.join(missing_fields),
+                    type='warning',
+                    timeout=6000
+                )
+                return
+
+            # -------------------------------------------------
+            # BASIC OBE ALIGNMENT SCORE
+            # -------------------------------------------------
+
+            score = 0
+            feedback = []
+
+            # CLO selected
+            if selected_clo.value:
+                score += 20
+                feedback.append('✓ CLO selected and linked to the lesson.')
+
+            # Lesson outcome
+            if lesson_outcome.value:
+                score += 20
+                feedback.append('✓ Lesson learning outcome is defined.')
+
+            # Teaching activity
+            if activity.value and teaching_method.value:
+                score += 20
+                feedback.append(
+                    '✓ Teaching method and learning activity are included.'
+                )
+
+            # Assessment
+            if assessment_method.value and assessment_task.value:
+                score += 20
+                feedback.append(
+                    '✓ Assessment method and task are specified.'
+                )
+
+            # Evaluation
+            if success_criterion.value and evaluation.value:
+                score += 20
+                feedback.append(
+                    '✓ Success criterion and improvement plan are included.'
+                )
+
+            # -------------------------------------------------
+            # SHOW RESULT
+            # -------------------------------------------------
+
+            with ui.dialog() as dialog, ui.card().classes(
+                'w-full max-w-2xl p-6'
+            ):
+
+                ui.label(
+                    'OBE Alignment Check'
+                ).classes(
+                    'text-2xl font-bold'
+                )
+
+                if score >= 80:
+                    ui.icon(
+                        'check_circle',
+                        color='green',
+                        size='55px'
+                    )
+
+                    ui.label(
+                        f'Alignment Score: {score}%'
+                    ).classes(
+                        'text-2xl font-bold text-green-700'
+                    )
+
+                    ui.label(
+                        'This lesson demonstrates strong OBE alignment.'
+                    ).classes(
+                        'text-lg'
+                    )
+
+                elif score >= 60:
+                    ui.icon(
+                        'warning',
+                        color='orange',
+                        size='55px'
+                    )
+
+                    ui.label(
+                        f'Alignment Score: {score}%'
+                    ).classes(
+                        'text-2xl font-bold text-orange-700'
+                    )
+
+                    ui.label(
+                        'The lesson is partially aligned. '
+                        'Some elements should be strengthened.'
+                    )
+
+                else:
+                    ui.icon(
+                        'error',
+                        color='red',
+                        size='55px'
+                    )
+
+                    ui.label(
+                        f'Alignment Score: {score}%'
+                    ).classes(
+                        'text-2xl font-bold text-red-700'
+                    )
+
+                    ui.label(
+                        'The lesson requires further OBE alignment.'
+                    )
+
+                ui.separator()
+
+                ui.label(
+                    'Alignment Evidence'
+                ).classes(
+                    'text-xl font-semibold'
+                )
+
+                for item in feedback:
+                    ui.label(item)
+
+                ui.button(
+                    'Close',
+                    on_click=dialog.close
+                ).props('outline')
+
+            dialog.open()
+
+
+        # =====================================================
+        # SAVE LESSON PLAN
+        # =====================================================
+
+        def save_lesson_plan():
+
+            if not selected_course.value:
+                ui.notify(
+                    'Please select a course first.',
+                    type='negative'
+                )
+                return
+
+            if not selected_clo.value:
+                ui.notify(
+                    'Please select a CLO first.',
+                    type='negative'
+                )
+                return
+
+            if not topic.value:
+                ui.notify(
+                    'Please enter the lesson topic.',
+                    type='negative'
+                )
+                return
+
+            ui.notify(
+                'Lesson plan is complete. '
+                'Database storage will be connected next.',
+                type='positive',
+                timeout=5000
+            )
+
+
+        # =====================================================
+        # BUTTONS
+        # =====================================================
+
+        with ui.row().classes(
+            'gap-4 q-mt-md'
+        ):
+
             ui.button(
                 'Check OBE Alignment',
-                icon='fact_check'
+                icon='fact_check',
+                on_click=check_alignment
+            ).props(
+                'unelevated'
             )
 
             ui.button(
                 'Save Lesson Plan',
-                icon='save'
+                icon='save',
+                on_click=save_lesson_plan
+            ).props(
+                'unelevated'
             )
 
 
