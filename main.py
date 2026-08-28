@@ -9,6 +9,9 @@ from database import (
     get_plos,
     add_clo,
     get_clos,
+    add_lesson_plan,
+    get_lesson_plans,
+    delete_lesson_plan,
 )
 
 # =========================================================
