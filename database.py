@@ -4,11 +4,19 @@ import sqlite3
 DB_NAME = 'obe_lesson_planner.db'
 
 
+# =========================================================
+# DATABASE CONNECTION
+# =========================================================
+
 def get_connection():
     conn = sqlite3.connect(DB_NAME)
     conn.row_factory = sqlite3.Row
     return conn
 
+
+# =========================================================
+# CREATE TABLES
+# =========================================================
 
 def create_tables():
     conn = get_connection()
@@ -55,6 +63,28 @@ def create_tables():
         )
     ''')
 
+    # -------------------------
+    # LESSON PLANS
+    # -------------------------
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS lesson_plans (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            course_id INTEGER NOT NULL,
+            clo_id INTEGER NOT NULL,
+            topic TEXT NOT NULL,
+            duration INTEGER,
+            lesson_outcome TEXT NOT NULL,
+            teaching_method TEXT,
+            activity TEXT,
+            assessment_method TEXT,
+            assessment_task TEXT,
+            success_criterion TEXT,
+            evaluation TEXT,
+            FOREIGN KEY (course_id) REFERENCES courses(id),
+            FOREIGN KEY (clo_id) REFERENCES clos(id)
+        )
+    ''')
+
     conn.commit()
     conn.close()
 
@@ -63,14 +93,24 @@ def create_tables():
 # COURSE FUNCTIONS
 # =========================================================
 
-def add_course(programme, course_code, course_title, credit_hours):
+def add_course(
+    programme,
+    course_code,
+    course_title,
+    credit_hours
+):
     conn = get_connection()
     cursor = conn.cursor()
 
     cursor.execute(
         '''
         INSERT INTO courses
-        (programme, course_code, course_title, credit_hours)
+        (
+            programme,
+            course_code,
+            course_title,
+            credit_hours
+        )
         VALUES (?, ?, ?, ?)
         ''',
         (
@@ -107,14 +147,22 @@ def get_courses():
 # PLO FUNCTIONS
 # =========================================================
 
-def add_plo(programme, plo_code, description):
+def add_plo(
+    programme,
+    plo_code,
+    description
+):
     conn = get_connection()
     cursor = conn.cursor()
 
     cursor.execute(
         '''
         INSERT INTO plos
-        (programme, plo_code, description)
+        (
+            programme,
+            plo_code,
+            description
+        )
         VALUES (?, ?, ?)
         ''',
         (
@@ -212,3 +260,123 @@ def get_clos():
     conn.close()
 
     return rows
+
+
+# =========================================================
+# LESSON PLAN FUNCTIONS
+# =========================================================
+
+def add_lesson_plan(
+    course_id,
+    clo_id,
+    topic,
+    duration,
+    lesson_outcome,
+    teaching_method,
+    activity,
+    assessment_method,
+    assessment_task,
+    success_criterion,
+    evaluation
+):
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    cursor.execute(
+        '''
+        INSERT INTO lesson_plans
+        (
+            course_id,
+            clo_id,
+            topic,
+            duration,
+            lesson_outcome,
+            teaching_method,
+            activity,
+            assessment_method,
+            assessment_task,
+            success_criterion,
+            evaluation
+        )
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        ''',
+        (
+            course_id,
+            clo_id,
+            topic,
+            duration,
+            lesson_outcome,
+            teaching_method,
+            activity,
+            assessment_method,
+            assessment_task,
+            success_criterion,
+            evaluation
+        )
+    )
+
+    conn.commit()
+    conn.close()
+
+
+def get_lesson_plans():
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    cursor.execute(
+        '''
+        SELECT
+            lesson_plans.id,
+            lesson_plans.topic,
+            lesson_plans.duration,
+            lesson_plans.lesson_outcome,
+            lesson_plans.teaching_method,
+            lesson_plans.activity,
+            lesson_plans.assessment_method,
+            lesson_plans.assessment_task,
+            lesson_plans.success_criterion,
+            lesson_plans.evaluation,
+
+            courses.course_code,
+            courses.course_title,
+
+            clos.clo_code,
+            clos.description AS clo_description,
+            clos.bloom_level
+
+        FROM lesson_plans
+
+        JOIN courses
+            ON lesson_plans.course_id = courses.id
+
+        JOIN clos
+            ON lesson_plans.clo_id = clos.id
+
+        ORDER BY lesson_plans.id DESC
+        '''
+    )
+
+    rows = cursor.fetchall()
+    conn.close()
+
+    return rows
+
+
+# =========================================================
+# DELETE LESSON PLAN
+# =========================================================
+
+def delete_lesson_plan(plan_id):
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    cursor.execute(
+        '''
+        DELETE FROM lesson_plans
+        WHERE id = ?
+        ''',
+        (plan_id,)
+    )
+
+    conn.commit()
+    conn.close()
