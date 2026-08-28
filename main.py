@@ -1281,7 +1281,7 @@ def lesson_planner():
             dialog.open()
 
 
-        # =====================================================
+                # =====================================================
         # SAVE LESSON PLAN
         # =====================================================
 
@@ -1308,11 +1308,31 @@ def lesson_planner():
                 )
                 return
 
+            if not lesson_outcome.value:
+                ui.notify(
+                    'Please enter the lesson learning outcome.',
+                    type='negative'
+                )
+                return
+
+            add_lesson_plan(
+                selected_course.value,
+                selected_clo.value,
+                topic.value,
+                int(duration.value) if duration.value else None,
+                lesson_outcome.value,
+                teaching_method.value,
+                activity.value,
+                assessment_method.value,
+                assessment_task.value,
+                success_criterion.value,
+                evaluation.value
+            )
+
             ui.notify(
-                'Lesson plan is complete. '
-                'Database storage will be connected next.',
+                'Lesson plan saved successfully!',
                 type='positive',
-                timeout=5000
+                timeout=4000
             )
 
 
@@ -1366,10 +1386,206 @@ def saved_plans():
             'text-3xl font-bold'
         )
 
-        ui.label(
-            'Saved lesson plans will appear here once '
-            'lesson-plan storage is connected.'
+        plans_container = ui.column().classes(
+            'w-full gap-4'
         )
+
+        def render_plans():
+
+            plans_container.clear()
+
+            with plans_container:
+
+                plans = get_lesson_plans()
+
+                if not plans:
+
+                    ui.label(
+                        'No lesson plans have been saved yet.'
+                    ).classes(
+                        'text-gray-600 text-lg'
+                    )
+
+                    return
+
+                for plan in plans:
+
+                    with ui.card().classes(
+                        'w-full p-6 gap-3'
+                    ).style(
+                        '''
+                        border-radius: 18px;
+                        border-left: 6px solid #14b8a6;
+                        '''
+                    ):
+
+                        # -----------------------------------------
+                        # HEADER
+                        # -----------------------------------------
+
+                        with ui.row().classes(
+                            'w-full items-center justify-between'
+                        ):
+
+                            with ui.column().classes(
+                                'gap-1'
+                            ):
+
+                                ui.label(
+                                    plan['topic']
+                                ).classes(
+                                    'text-2xl font-bold'
+                                )
+
+                                ui.label(
+                                    f"{plan['course_code']} - "
+                                    f"{plan['course_title']}"
+                                ).classes(
+                                    'text-lg font-semibold text-gray-700'
+                                )
+
+                                ui.label(
+                                    f"CLO: {plan['clo_code']} "
+                                    f"[{plan['bloom_level']}]"
+                                ).classes(
+                                    'text-gray-600'
+                                )
+
+                            # -------------------------------------
+                            # DELETE FUNCTION
+                            # -------------------------------------
+
+                            def delete_plan(
+                                plan_id=plan['id']
+                            ):
+
+                                delete_lesson_plan(
+                                    plan_id
+                                )
+
+                                ui.notify(
+                                    'Lesson plan deleted.',
+                                    type='positive'
+                                )
+
+                                render_plans()
+
+                            ui.button(
+                                'Delete',
+                                icon='delete',
+                                on_click=delete_plan
+                            ).props(
+                                'outline color=negative'
+                            )
+
+                        ui.separator()
+
+                        # -----------------------------------------
+                        # QUICK INFORMATION
+                        # -----------------------------------------
+
+                        with ui.row().classes(
+                            'w-full gap-6 flex-wrap'
+                        ):
+
+                            ui.label(
+                                f"Duration: "
+                                f"{plan['duration'] or '-'} minutes"
+                            )
+
+                            ui.label(
+                                f"Teaching Method: "
+                                f"{plan['teaching_method'] or '-'}"
+                            )
+
+                            ui.label(
+                                f"Assessment Method: "
+                                f"{plan['assessment_method'] or '-'}"
+                            )
+
+                        # -----------------------------------------
+                        # LESSON LEARNING OUTCOME
+                        # -----------------------------------------
+
+                        ui.label(
+                            'Lesson Learning Outcome'
+                        ).classes(
+                            'font-semibold text-lg'
+                        )
+
+                        ui.label(
+                            plan['lesson_outcome'] or '-'
+                        )
+
+                        # -----------------------------------------
+                        # ACTIVITY
+                        # -----------------------------------------
+
+                        ui.label(
+                            'Teaching / Learning Activity'
+                        ).classes(
+                            'font-semibold text-lg'
+                        )
+
+                        ui.label(
+                            plan['activity'] or '-'
+                        )
+
+                        # -----------------------------------------
+                        # ASSESSMENT
+                        # -----------------------------------------
+
+                        ui.label(
+                            'Assessment Task'
+                        ).classes(
+                            'font-semibold text-lg'
+                        )
+
+                        ui.label(
+                            plan['assessment_task'] or '-'
+                        )
+
+                        # -----------------------------------------
+                        # SUCCESS CRITERION
+                        # -----------------------------------------
+
+                        ui.label(
+                            'Success Criterion'
+                        ).classes(
+                            'font-semibold text-lg'
+                        )
+
+                        ui.label(
+                            plan['success_criterion'] or '-'
+                        )
+
+                        # -----------------------------------------
+                        # EVALUATION
+                        # -----------------------------------------
+
+                        ui.label(
+                            'Evaluation / Improvement Plan'
+                        ).classes(
+                            'font-semibold text-lg'
+                        )
+
+                        ui.label(
+                            plan['evaluation'] or '-'
+                        )
+
+        render_plans()
+
+
+# =========================================================
+# RUN APP
+# =========================================================
+
+ui.run(
+    title='OBE Lesson Planning Assistant',
+    host='0.0.0.0',
+    port=int(os.environ.get('PORT', 8080)),
+    reload=False
+)
 
 
 # =========================================================
