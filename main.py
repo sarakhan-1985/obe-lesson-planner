@@ -1399,7 +1399,6 @@ Return ONLY valid JSON using exactly these keys:
                     timeout=8000
                 )
 
-
         # =====================================================
         # AI GENERATE BUTTON
         # =====================================================
@@ -1422,7 +1421,6 @@ Return ONLY valid JSON using exactly these keys:
             padding: 10px 22px;
             '''
         )
-
 
         # =====================================================
         # OBE ALIGNMENT CHECK
