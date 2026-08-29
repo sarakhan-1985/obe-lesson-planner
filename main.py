@@ -1,5 +1,11 @@
 from nicegui import ui
 import os
+import json
+
+from openai import OpenAI
+client = OpenAI(
+    api_key=os.environ.get("OPENAI_API_KEY")
+)
 
 from database import (
     create_tables,
@@ -1108,7 +1114,297 @@ def lesson_planner():
             )
         ).classes('w-full')
 
-       
+               # =====================================================
+        # AI LESSON PLAN GENERATOR
+        # =====================================================
+
+        def generate_ai_lesson_plan():
+
+            # -------------------------------------------------
+            # VALIDATION
+            # -------------------------------------------------
+
+            if not selected_course.value:
+                ui.notify(
+                    'Please select a course first.',
+                    type='warning'
+                )
+                return
+
+            if not selected_clo.value:
+                ui.notify(
+                    'Please select a CLO first.',
+                    type='warning'
+                )
+                return
+
+            if not topic.value:
+                ui.notify(
+                    'Please enter the lesson topic.',
+                    type='warning'
+                )
+                return
+
+            if not duration.value:
+                ui.notify(
+                    'Please enter the lesson duration.',
+                    type='warning'
+                )
+                return
+
+            # -------------------------------------------------
+            # GET SELECTED COURSE
+            # -------------------------------------------------
+
+            selected_course_data = next(
+                (
+                    course for course in courses
+                    if course['id'] == selected_course.value
+                ),
+                None
+            )
+
+            # -------------------------------------------------
+            # GET SELECTED CLO
+            # -------------------------------------------------
+
+            selected_clo_data = next(
+                (
+                    clo for clo in clos
+                    if clo['id'] == selected_clo.value
+                ),
+                None
+            )
+
+            if not selected_course_data or not selected_clo_data:
+                ui.notify(
+                    'Unable to retrieve course or CLO information.',
+                    type='negative'
+                )
+                return
+
+            course_name = (
+                f"{selected_course_data['course_code']} - "
+                f"{selected_course_data['course_title']}"
+            )
+
+            clo_code = selected_clo_data['clo_code']
+            clo_description = selected_clo_data['description']
+            bloom_level = selected_clo_data['bloom_level']
+
+            # -------------------------------------------------
+            # PROMPT
+            # -------------------------------------------------
+
+            prompt = f"""
+You are an expert university teacher and Outcome-Based Education
+(OBE) lesson planning specialist.
+
+Develop a constructively aligned university lesson plan.
+
+COURSE:
+{course_name}
+
+COURSE LEARNING OUTCOME:
+{clo_code}: {clo_description}
+
+BLOOM'S TAXONOMY LEVEL:
+{bloom_level}
+
+LESSON TOPIC:
+{topic.value}
+
+LESSON DURATION:
+{int(duration.value)} minutes
+
+The lesson must demonstrate clear constructive alignment between:
+
+CLO
+→ Lesson Learning Outcome
+→ Teaching Method
+→ Teaching/Learning Activity
+→ Assessment
+→ Success Criterion
+→ Evaluation and Improvement
+
+IMPORTANT REQUIREMENTS:
+
+1. The lesson learning outcome must be specific, measurable,
+   and appropriately aligned with the CLO and Bloom's level.
+
+2. Select ONE teaching method only from this exact list:
+
+Interactive Lecture
+Discussion
+Guided Practice
+Think-Pair-Share
+Collaborative Learning
+Problem-Based Learning
+Case-Based Learning
+Project-Based Learning
+Flipped Learning
+
+3. The teaching/learning activity should be detailed and practical.
+   Explain what the teacher does and what students do.
+   Make it suitable for the specified lesson duration.
+
+4. Select ONE assessment method only from this exact list:
+
+Quiz
+Worksheet
+Class Activity
+Presentation
+Written Task
+Reflection
+Peer Assessment
+Group Task
+Exit Ticket
+Project
+
+5. The assessment task must directly measure achievement
+   of the lesson learning outcome and CLO.
+
+6. Provide a measurable success criterion.
+
+7. Provide a meaningful evaluation/improvement plan explaining
+   how the teacher will use student performance to improve
+   subsequent teaching.
+
+8. Write natural professional academic prose. Do not make
+   the activity excessively brief. The activity and assessment
+   descriptions should be sufficiently detailed for a teacher
+   to implement in class.
+
+Return ONLY valid JSON using exactly these keys:
+
+{{
+    "lesson_outcome": "",
+    "teaching_method": "",
+    "activity": "",
+    "assessment_method": "",
+    "assessment_task": "",
+    "success_criterion": "",
+    "evaluation": ""
+}}
+"""
+
+            # -------------------------------------------------
+            # CALL OPENAI
+            # -------------------------------------------------
+
+            try:
+
+                ui.notify(
+                    'Generating AI-assisted lesson plan...',
+                    type='info'
+                )
+
+                response = client.responses.create(
+                    model="gpt-5.6-luna",
+                    input=prompt
+                )
+
+                result_text = response.output_text.strip()
+
+                # Remove possible Markdown code fences
+                if result_text.startswith("```"):
+                    result_text = result_text.replace(
+                        "```json", ""
+                    ).replace(
+                        "```", ""
+                    ).strip()
+
+                generated_plan = json.loads(result_text)
+
+                # -------------------------------------------------
+                # POPULATE FORM
+                # -------------------------------------------------
+
+                lesson_outcome.value = generated_plan.get(
+                    'lesson_outcome',
+                    ''
+                )
+
+                teaching_method.value = generated_plan.get(
+                    'teaching_method',
+                    None
+                )
+
+                activity.value = generated_plan.get(
+                    'activity',
+                    ''
+                )
+
+                assessment_method.value = generated_plan.get(
+                    'assessment_method',
+                    None
+                )
+
+                assessment_task.value = generated_plan.get(
+                    'assessment_task',
+                    ''
+                )
+
+                success_criterion.value = generated_plan.get(
+                    'success_criterion',
+                    ''
+                )
+
+                evaluation.value = generated_plan.get(
+                    'evaluation',
+                    ''
+                )
+
+                # Update UI
+                lesson_outcome.update()
+                teaching_method.update()
+                activity.update()
+                assessment_method.update()
+                assessment_task.update()
+                success_criterion.update()
+                evaluation.update()
+
+                ui.notify(
+                    'AI lesson plan generated successfully. '
+                    'Please review and edit before saving.',
+                    type='positive',
+                    timeout=6000
+                )
+
+            except json.JSONDecodeError:
+
+                ui.notify(
+                    'AI generated an unexpected response. '
+                    'Please try again.',
+                    type='negative',
+                    timeout=6000
+                )
+
+            except Exception as e:
+
+                ui.notify(
+                    f'AI generation error: {str(e)}',
+                    type='negative',
+                    timeout=8000
+                )
+                        ui.button(
+            'Generate AI Lesson Plan',
+            icon='auto_awesome',
+            on_click=generate_ai_lesson_plan
+        ).props(
+            'unelevated'
+        ).style(
+            '''
+            background: linear-gradient(
+                90deg,
+                #7c3aed,
+                #db2777
+            );
+            color: white;
+            font-weight: 700;
+            padding: 10px 22px;
+            '''
+        )
 
         # =====================================================
         # OBE ALIGNMENT CHECK
