@@ -3,9 +3,6 @@ import os
 import json
 
 from openai import OpenAI
-client = OpenAI(
-    api_key=os.environ.get("OPENAI_API_KEY")
-)
 
 from database import (
     create_tables,
@@ -1114,7 +1111,7 @@ def lesson_planner():
             )
         ).classes('w-full')
 
-               # =====================================================
+        # =====================================================
         # AI LESSON PLAN GENERATOR
         # =====================================================
 
@@ -1287,6 +1284,20 @@ Return ONLY valid JSON using exactly these keys:
     "evaluation": ""
 }}
 """
+            # -------------------------------------------------
+            # OPENAI API KEY
+            # -------------------------------------------------
+
+            api_key = os.environ.get("OPENAI_API_KEY")
+
+            if not api_key:
+                ui.notify(
+                    'OpenAI API key is not configured.',
+                    type='negative'
+                )
+                return
+
+            client = OpenAI(api_key=api_key)
 
             # -------------------------------------------------
             # CALL OPENAI
@@ -1300,7 +1311,7 @@ Return ONLY valid JSON using exactly these keys:
                 )
 
                 response = client.responses.create(
-                    model="gpt-5.6-luna",
+                    model="gpt-5-mini",
                     input=prompt
                 )
 
