@@ -1398,7 +1398,13 @@ Return ONLY valid JSON using exactly these keys:
                     type='negative',
                     timeout=8000
                 )
-                        ui.button(
+
+
+        # =====================================================
+        # AI GENERATE BUTTON
+        # =====================================================
+
+        ui.button(
             'Generate AI Lesson Plan',
             icon='auto_awesome',
             on_click=generate_ai_lesson_plan
@@ -1416,6 +1422,15 @@ Return ONLY valid JSON using exactly these keys:
             padding: 10px 22px;
             '''
         )
+
+
+        # =====================================================
+        # OBE ALIGNMENT CHECK
+        # =====================================================
+
+        def check_alignment():
+
+            missing_fields = []
 
         # =====================================================
         # OBE ALIGNMENT CHECK
