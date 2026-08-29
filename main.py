@@ -1430,14 +1430,6 @@ Return ONLY valid JSON using exactly these keys:
 
             missing_fields = []
 
-        # =====================================================
-        # OBE ALIGNMENT CHECK
-        # =====================================================
-
-        def check_alignment():
-
-            missing_fields = []
-
             if not selected_course.value:
                 missing_fields.append('Course')
 
