@@ -2,7 +2,7 @@ from nicegui import ui
 import os
 import json
 
-from openai import OpenAI
+from openai import AsyncOpenAI
 
 from database import (
     create_tables,
@@ -1115,7 +1115,7 @@ def lesson_planner():
         # AI LESSON PLAN GENERATOR
         # =====================================================
 
-        def generate_ai_lesson_plan():
+        async def generate_ai_lesson_plan():
 
             # -------------------------------------------------
             # VALIDATION
@@ -1297,7 +1297,7 @@ Return ONLY valid JSON using exactly these keys:
                 )
                 return
 
-            client = OpenAI(api_key=api_key)
+            client = AsyncOpenAI(api_key=api_key)
 
             # -------------------------------------------------
             # CALL OPENAI
@@ -1310,7 +1310,7 @@ Return ONLY valid JSON using exactly these keys:
                     type='info'
                 )
 
-                response = client.responses.create(
+                response = await client.responses.create(
                     model="gpt-5.6-luna",
                     input=prompt
                 )
@@ -1393,10 +1393,12 @@ Return ONLY valid JSON using exactly these keys:
 
             except Exception as e:
 
+                print("OPENAI ERROR:", repr(e))
+
                 ui.notify(
                     f'AI generation error: {str(e)}',
                     type='negative',
-                    timeout=8000
+                    timeout=10000
                 )
 
         # =====================================================
@@ -1898,6 +1900,5 @@ ui.run(
     port=int(os.environ.get('PORT', 8080)),
     reload=False
 )
-
 
 
